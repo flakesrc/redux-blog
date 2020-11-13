@@ -7,12 +7,26 @@ const initialState = [
     title: 'First Post!',
     content: 'Hello!',
     date: sub(new Date(), { minutes: 10 }).toISOString(),
+    reactions: {
+      thumbsUp: 0,
+      hooray: 0,
+      heart: 0,
+      rocket: 0,
+      eyes: 0,
+    },
   },
   {
     id: '2',
     title: 'Second Post',
     content: 'More text',
     date: sub(new Date(), { minutes: 10 }).toISOString(),
+    reactions: {
+      thumbsUp: 0,
+      hooray: 0,
+      heart: 0,
+      rocket: 0,
+      eyes: 0,
+    },
   },
 ]
 
@@ -21,11 +35,7 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     postAdded: {
-      // quando despachar a ação, os args serão tratados
-      // pelo prepare, e posteriormente
-      // o prepare irá gerar um payload que será
-      // recebido e manipulado pelo reducer
-      prepare: (title, content, userId) => {
+      prepare(title, content, userId) {
         return {
           payload: {
             id: nanoid(),
@@ -36,11 +46,11 @@ const postsSlice = createSlice({
           },
         }
       },
-      reducer: (state, action) => {
+      reducer(state, action) {
         state.push(action.payload)
       },
     },
-    postUpdated: (state, action) => {
+    postUpdated(state, action) {
       const { id, title, content } = action.payload
       const existingPost = state.find((post) => post.id === id)
       if (existingPost) {
@@ -48,9 +58,16 @@ const postsSlice = createSlice({
         existingPost.content = content
       }
     },
+    reactionAdded(state, action) {
+      const { postId, reaction } = action.payload
+      const existingPost = state.find((post) => post.id === postId)
+      if (existingPost) {
+        existingPost.reactions[reaction]++
+      }
+    },
   },
 })
 
-export const { postAdded, postUpdated } = postsSlice.actions
+export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
